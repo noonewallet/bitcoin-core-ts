@@ -3,7 +3,7 @@ import {BaseTx} from '@modules/base-tx'
 import converter from '@helpers/converters'
 import {getBtcPrivateKeyByIndex} from '@helpers/utils'
 import CustomError from '@helpers/error/custom-error'
-import {IHeader, IInput, IOutput, IRawTxData, ITxData} from '@helpers/types'
+import {IInput, IOutput, IRawTxData, ITxData} from '@helpers/types'
 import {networks} from '@helpers/networks'
 import {Network} from 'bitcoinjs-lib'
 import {LTC, ICurrency} from '@helpers/currencies'
@@ -16,7 +16,6 @@ import {LTC, ICurrency} from '@helpers/currencies'
  */
 
 export class LtcTx extends BaseTx {
-  private headers: IHeader | undefined
   private txOptions: {maximumFeeRate: number; network: Network}
   private currency: ICurrency
 
@@ -29,7 +28,6 @@ export class LtcTx extends BaseTx {
    */
   constructor(data: ITxData) {
     super(data)
-    this.headers = data?.headers
     this.feeIds = ['optimal', 'custom']
     this.currency = LTC
     this.type = LTC.type

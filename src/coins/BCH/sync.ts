@@ -1,6 +1,6 @@
 import {HDNode} from '@noonewallet/core-js'
 import {getBchAddressByNode} from '@coins/BCH/utils'
-import {IHeader, Address} from '@helpers/types'
+import {Address} from '@helpers/types'
 import {BaseSyncWithMethods} from '@modules/base-sync'
 import {BCH} from '@helpers/currencies'
 // @ts-ignore
@@ -14,12 +14,8 @@ import {CoinsNetwork} from '@noonewallet/network-js'
  */
 
 export class BchSync extends BaseSyncWithMethods {
-  constructor(
-    externalNodeKey: string,
-    internalNodeKey: string,
-    headers: IHeader,
-  ) {
-    super(externalNodeKey, internalNodeKey, headers)
+  constructor(externalNodeKey: string, internalNodeKey: string) {
+    super(externalNodeKey, internalNodeKey)
     this.network = BCH.network
     this.type = BCH.type
     this.setReqHandler(CoinsNetwork.bch)

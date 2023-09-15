@@ -5,12 +5,7 @@ import {
   IUnspent,
 } from '@helpers/types'
 
-const defaultNoRestoredParams = [
-  'externalNode',
-  'internalNode',
-  'headers',
-  'request',
-]
+const defaultNoRestoredParams = ['externalNode', 'internalNode', 'request']
 
 export interface IRestoreData {
   addresses: {
