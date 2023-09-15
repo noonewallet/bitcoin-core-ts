@@ -1,7 +1,7 @@
 import {BaseTx} from '@modules/base-tx'
 import converter from '@helpers/converters'
 import {getBtcPrivateKeyByIndex} from '@helpers/utils'
-import {IHeader, IInput, IOutput, IRawTxData, ITxData} from '@helpers/types'
+import {IInput, IOutput, IRawTxData, ITxData} from '@helpers/types'
 import {BCH, ICurrency} from '@helpers/currencies'
 import CustomError from '@helpers/error/custom-error'
 import {makeRawBchTx} from '@coins/BCH/utils'
@@ -22,12 +22,10 @@ export class BchTx extends BaseTx {
    * @param {Array} data.feeList - Set of raw Bitcoin Cash fees
    * @param {Object} data.nodes - External and internal Bitcoin Cash nodes
    */
-  private headers: IHeader | undefined
   private currency: ICurrency
 
   constructor(data: ITxData) {
     super(data)
-    this.headers = data?.headers
     this.feeIds = ['optimal', 'custom']
     this.currency = BCH
     this.type = BCH.type

@@ -4,7 +4,6 @@ import converter from '@helpers/converters'
 import {getBtcPrivateKeyByIndex} from '@helpers/utils'
 import CustomError from '@helpers/error/custom-error'
 import {
-  IHeader,
   IInput,
   IOutput,
   IRawTxData,
@@ -27,7 +26,6 @@ import {DOGE, ICurrency} from '@helpers/currencies'
  */
 
 export class DogeTx extends BaseTx {
-  private headers: IHeader | undefined
   private txOptions: {maximumFeeRate: number; network: Network}
   private currency: ICurrency
   private reqHandler: any
@@ -41,7 +39,6 @@ export class DogeTx extends BaseTx {
    */
   constructor(data: ITxData) {
     super(data)
-    this.headers = data?.headers
     this.feeIds = ['optimal', 'custom']
     this.currency = DOGE
     this.type = DOGE.type
@@ -89,10 +86,7 @@ export class DogeTx extends BaseTx {
     }
 
     const unique_hashes = [...new Set(hashes)]
-    const rawTxsData = await this.reqHandler.getRawTx(
-      unique_hashes,
-      this.headers,
-    )
+    const rawTxsData = await this.reqHandler.getRawTx(unique_hashes)
 
     for (const utxo of fee.inputs) {
       hashes.push(utxo.transaction_hash)

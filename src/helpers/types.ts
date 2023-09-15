@@ -5,10 +5,6 @@ export type CurrencyType = 'p2pkh' | 'p2wpkh'
 export type NodeType = 'internal' | 'external'
 export type ActionType = 'incoming' | 'outgoing'
 
-export interface IHeader {
-  [key: string]: string
-}
-
 export interface INodeSyncItem {
   node: HDNode
   type: NodeType
@@ -136,7 +132,6 @@ export interface ITxData {
   }
   feeList: IFeeSync[]
   type: CurrencyType
-  headers?: IHeader
 }
 
 export interface IRawTxData {

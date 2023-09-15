@@ -6,7 +6,6 @@ import CustomError from '@helpers/error/custom-error'
 
 import {
   // CurrencyType,
-  IHeader,
   IInput,
   IOutput,
   IRawTxData,
@@ -28,7 +27,6 @@ const request = CoinsNetwork.btc
  */
 
 export class BtcTx extends BaseTx {
-  private headers: IHeader | undefined
   private currency: ICurrency
 
   /**
@@ -38,13 +36,11 @@ export class BtcTx extends BaseTx {
    * @param {Array} data.feeList - Set of bitcoin fees
    * @param {Object} data.nodes - External and internal nodes required to generate private keys
    * @param {String} data.type - Bitcoin type. There may be p2pkh or p2wpkh
-   * @param {Object} data.headers - Request headers
    */
 
   constructor(data: ITxData) {
     super(data)
     // this.feeIds = FeeIds
-    this.headers = data?.headers
     this.type = data.type || 'p2pkh'
     this.currency = this.type === 'p2pkh' ? BTC : BTC_SEGWIT
   }
@@ -114,7 +110,7 @@ export class BtcTx extends BaseTx {
         }
         const unique_hashes = [...new Set(hashes)]
 
-        rawTxsData = await request.getRawTx(unique_hashes, this.headers)
+        rawTxsData = await request.getRawTx(unique_hashes)
 
         for (const input of inputs) {
           const item: IInput = {

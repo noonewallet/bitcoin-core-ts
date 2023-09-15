@@ -3,7 +3,6 @@ import {getAddressByNode} from '@helpers/utils'
 import {
   CurrencyType,
   NodeType,
-  IHeader,
   IEmptyAddress,
   INodeSyncItem,
   IAddressSyncItem,
@@ -44,7 +43,6 @@ export class BaseSync {
     unique: ITxSyncItem[]
   }
   protected fee: IFeeSync[]
-  protected headers: IHeader
   protected type: CurrencyType
   protected reqHandler: null
   protected network: NetworkType
@@ -52,7 +50,6 @@ export class BaseSync {
   constructor(
     externalNodeKey: string,
     internalNodeKey: string,
-    headers: IHeader,
     type?: CurrencyType,
   ) {
     this.externalNode = hdFromXprv(externalNodeKey)
@@ -91,7 +88,6 @@ export class BaseSync {
       unique: [],
     }
     this.fee = []
-    this.headers = headers
     this.type = type || 'p2pkh'
     this.reqHandler = null
     this.network = 'btc'
@@ -122,10 +118,9 @@ export class BaseSyncWithMethods extends BaseSync {
   constructor(
     externalNodeKey: string,
     internalNodeKey: string,
-    headers: IHeader,
     type?: CurrencyType,
   ) {
-    super(externalNodeKey, internalNodeKey, headers, type)
+    super(externalNodeKey, internalNodeKey, type)
   }
 
   public async Start(): Promise<void> {
@@ -254,10 +249,7 @@ export class BaseSyncWithMethods extends BaseSync {
       try {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        const res = await this.reqHandler.getAddressInfo(
-          addresses,
-          this.headers,
-        )
+        const res = await this.reqHandler.getAddressInfo(addresses)
         if (res.hasOwnProperty('utxo')) {
           this.unspent = [...this.unspent, ...res.utxo]
         }
@@ -375,7 +367,7 @@ export class BaseSyncWithMethods extends BaseSync {
   async getFees(): Promise<void> {
     try {
       // @ts-ignore
-      this.fee = await this.reqHandler.getFees(this.headers)
+      this.fee = await this.reqHandler.getFees()
     } catch (err) {
       console.log('BTC getFeesRequest', err)
     }

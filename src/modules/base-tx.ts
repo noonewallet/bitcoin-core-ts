@@ -10,7 +10,6 @@ import {
   IFeeInputScope,
   FeeId,
 } from '@helpers/types'
-import {ICurrency} from '@helpers/currencies'
 
 export const FeeIds: FeeId[] = ['fast', 'medium', 'custom']
 
