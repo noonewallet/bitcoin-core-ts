@@ -1,4 +1,4 @@
-import {hdFromSeed, mnemonicToSeed} from '@noonewallet/core-js'
+import {hdFromSeed, mnemonicToSeed} from '@noonewallet/crypto-core-ts'
 import {BTC} from '@helpers/currencies'
 import {BaseTx} from '@modules/base-tx'
 import {ITxData} from '@helpers/types'
@@ -18,7 +18,7 @@ const getBtcNode = () => {
 }
 
 describe('BTC based txs', () => {
-  test.only('It should create Bitcoin based tx', () => {
+  test('It should create Bitcoin based tx', () => {
     const nodes = getBtcNode()
     const data: ITxData = {
       unspent: [],

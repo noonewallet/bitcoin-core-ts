@@ -1,4 +1,4 @@
-import {hdFromSeed, mnemonicToSeed} from '@noonewallet/core-js'
+import {hdFromSeed, mnemonicToSeed} from '@noonewallet/crypto-core-ts'
 import {DOGE} from '@helpers/currencies'
 import {ITxData} from '@helpers/types'
 import {DogeTx} from '../../src'

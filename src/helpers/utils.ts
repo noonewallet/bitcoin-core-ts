@@ -1,5 +1,5 @@
 import * as bitcoin from 'bitcoinjs-lib'
-import {HDNode, privateKeyToWIF, hdFromXprv} from '@noonewallet/core-js'
+import {HDNode, privateKeyToWIF, hdFromXprv} from '@noonewallet/crypto-core-ts'
 import {networks, NetworkType} from '@helpers/networks'
 import CustomError from '@helpers/error/custom-error'
 import {CurrencyType, ICoinCore} from '@helpers/types'

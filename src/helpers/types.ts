@@ -1,4 +1,4 @@
-import {HDNode} from '@noonewallet/core-js'
+import {HDNode} from '@noonewallet/crypto-core-ts'
 import {Network} from 'bitcoinjs-lib'
 
 export type CurrencyType = 'p2pkh' | 'p2wpkh'

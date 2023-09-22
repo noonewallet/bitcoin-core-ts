@@ -1,4 +1,4 @@
-import {hdFromXprv, HDNode} from '@noonewallet/core-js'
+import {hdFromXprv, HDNode} from '@noonewallet/crypto-core-ts'
 import {getAddressByNode} from '@helpers/utils'
 import {
   CurrencyType,

@@ -1,4 +1,4 @@
-import {HDNode} from '@noonewallet/core-js'
+import {HDNode} from '@noonewallet/crypto-core-ts'
 import {getBchAddressByNode} from '@coins/BCH/utils'
 import {Address} from '@helpers/types'
 import {BaseSyncWithMethods} from '@modules/base-sync'
