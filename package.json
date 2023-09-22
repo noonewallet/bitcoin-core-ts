@@ -57,7 +57,7 @@
     "typescript": "^4.9.4"
   },
   "dependencies": {
-    "@noonewallet/core-js": "file:../core-js",
+    "@noonewallet/crypto-core-ts": "github:noonewallet/crypto-core-ts",
     "@noonewallet/network-js": "file:../network-js",
     "bchaddrjs": "^0.5.2",
     "bitcoinjs-lib": "=6.1.0",

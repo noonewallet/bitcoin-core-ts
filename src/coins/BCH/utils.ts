@@ -1,7 +1,7 @@
 import * as bchaddr from 'bchaddrjs'
 import * as bitcore from 'bitcore-lib-cash'
 import CustomError from '@helpers/error/custom-error'
-import {HDNode} from '@noonewallet/core-js'
+import {HDNode} from '@noonewallet/crypto-core-ts'
 import {Address, ICoinCore, IInput, IOutput} from '@helpers/types'
 import {BCH} from '@helpers/currencies'
 // @ts-ignore

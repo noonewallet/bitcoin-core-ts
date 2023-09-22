@@ -1,4 +1,4 @@
-import {hdFromXprv, HDNode} from '@noonewallet/core-js'
+import {hdFromXprv, HDNode} from '@noonewallet/crypto-core-ts'
 import converter from '@helpers/converters'
 import {calcTxSize} from '@helpers/utils'
 import {
