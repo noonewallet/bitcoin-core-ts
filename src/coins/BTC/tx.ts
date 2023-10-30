@@ -15,9 +15,9 @@ import {
 } from '@helpers/types'
 
 // @ts-ignore
-import {CoinsNetwork} from '@noonewallet/network-js'
+// import {CoinsNetwork} from '@noonewallet/network-js'
 import {BTC, BTC_SEGWIT, ICurrency} from '@helpers/currencies'
-const request = CoinsNetwork.btc
+// const request = CoinsNetwork.btc
 
 /**
  * Class BitcoinTx.
@@ -93,7 +93,7 @@ export class BtcTx extends BaseTx {
 
   async getInputsWithTxInfo(inputs: IUnspent[]): Promise<IInput[] | undefined> {
     try {
-      let rawTxsData = []
+      let rawTxsData: any[] = []
       const finalInputs: IInput[] = []
 
       if (this.type === 'p2pkh') {
@@ -110,7 +110,8 @@ export class BtcTx extends BaseTx {
         }
         const unique_hashes = [...new Set(hashes)]
 
-        rawTxsData = await request.getRawTx(unique_hashes)
+        // rawTxsData = await request.getRawTx(unique_hashes)
+        rawTxsData = []
 
         for (const input of inputs) {
           const item: IInput = {

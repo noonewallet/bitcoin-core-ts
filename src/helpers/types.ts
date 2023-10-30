@@ -1,14 +1,8 @@
-import {HDNode} from '@noonewallet/crypto-core-ts'
 import {Network} from 'bitcoinjs-lib'
 
 export type CurrencyType = 'p2pkh' | 'p2wpkh'
 export type NodeType = 'internal' | 'external'
 export type ActionType = 'incoming' | 'outgoing'
-
-export interface INodeSyncItem {
-  node: HDNode
-  type: NodeType
-}
 
 export interface IAddressSyncItem {
   type: NodeType
@@ -20,11 +14,6 @@ export interface IAddressSyncItem {
 export interface IDeriveAddressInfo {
   index: number | null
   node: NodeType
-}
-
-export interface IEmptyAddressData {
-  status: boolean
-  data: IAddressSyncItem
 }
 
 export interface IEmptyAddress {
@@ -69,21 +58,6 @@ export interface ITxSyncItemBtcv {
   }
 }
 
-export interface ITxHistoryItemBtcv {
-  address: string
-  txs: ITxSyncItemBtcv[]
-}
-
-export interface IUnspentBtcv {
-  address: string
-  derive_index: number | null
-  height: number
-  node_type: NodeType
-  tx_hash: string
-  tx_pos: number
-  value: number
-}
-
 export interface IUnspent {
   address: string
   block_id: number
@@ -94,9 +68,6 @@ export interface IUnspent {
   value: number
   tx?: RawTx
   key?: string
-  tx_hash?: string // for BTCV
-  tx_pos?: number // for BTCV
-  height?: number // for BTCV
 }
 
 export interface IFeeSync {
