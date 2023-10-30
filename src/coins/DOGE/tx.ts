@@ -11,8 +11,7 @@ import {
   ITxData,
 } from '@helpers/types'
 import {networks} from '@helpers/networks'
-// @ts-ignore
-import {CoinsNetwork} from '@noonewallet/network-js'
+// import {CoinsNetwork} from '@noonewallet/network-js'
 import {Network} from 'bitcoinjs-lib'
 import {DOGE, ICurrency} from '@helpers/currencies'
 
@@ -43,7 +42,7 @@ export class DogeTx extends BaseTx {
     this.currency = DOGE
     this.type = DOGE.type
     this.txOptions = {network: networks.doge, maximumFeeRate: 2000000}
-    this.reqHandler = CoinsNetwork.doge
+    // this.reqHandler = CoinsNetwork.doge
   }
 
   /**
@@ -85,8 +84,9 @@ export class DogeTx extends BaseTx {
       }
     }
 
-    const unique_hashes = [...new Set(hashes)]
-    const rawTxsData = await this.reqHandler.getRawTx(unique_hashes)
+    // const unique_hashes = [...new Set(hashes)]
+    const rawTxsData: any[] = []
+    // const rawTxsData = await this.reqHandler.getRawTx(unique_hashes)
 
     for (const utxo of fee.inputs) {
       hashes.push(utxo.transaction_hash)

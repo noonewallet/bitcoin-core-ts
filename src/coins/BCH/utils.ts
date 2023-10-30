@@ -2,10 +2,8 @@ import * as bchaddr from 'bchaddrjs'
 import * as bitcore from 'bitcore-lib-cash'
 import CustomError from '@helpers/error/custom-error'
 import {HDNode} from '@noonewallet/crypto-core-ts'
-import {Address, ICoinCore, IInput, IOutput} from '@helpers/types'
+import {Address, IInput, IOutput} from '@helpers/types'
 import {BCH} from '@helpers/currencies'
-// @ts-ignore
-import {Transaction} from '@types/bitcore-lib-cash'
 
 /**
  * Getting Bitcoin Cash address by node and derivation index

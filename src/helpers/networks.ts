@@ -54,3 +54,5 @@ export const networks: NetworkList = {
     wif: 0xb0, //176,
   },
 }
+
+export {Network}

@@ -58,7 +58,6 @@
   },
   "dependencies": {
     "@noonewallet/crypto-core-ts": "github:noonewallet/crypto-core-ts",
-    "@noonewallet/network-js": "file:../network-js",
     "bchaddrjs": "^0.5.2",
     "bitcoinjs-lib": "=6.1.0",
     "bitcore-lib-cash": "=8.22.1",

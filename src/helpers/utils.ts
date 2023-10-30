@@ -6,6 +6,7 @@ import {CurrencyType, ICoinCore} from '@helpers/types'
 import * as currencies from '@helpers/currencies'
 import {getBchAddressByNode, getBchAddressByPublicKey} from '@coins/BCH/utils'
 
+export {getBchAddressByNode, getBchAddressByPublicKey}
 /**
  * Getting a bitcoin address by node and child index
  * @param {Object} node - HDkey node
@@ -255,7 +256,7 @@ export function getBtcPrivateKeyByIndex(node: HDNode, index: number): string {
  */
 
 export function calcTxSize(i = 1, o = 2, isWitness = false): number {
-  let result = 0
+  let result
 
   if (isWitness) {
     const base_size = 41 * i + 32 * o + 10
