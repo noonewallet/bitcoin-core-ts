@@ -1,6 +1,5 @@
 import {Network} from 'bitcoinjs-lib'
 
-// export type NetworkType = 'btc' | 'btcv'
 export type NetworkType = 'btc' | 'btcv' | 'doge' | 'ltc' | 'mainnet'
 
 interface NetworkList {
@@ -52,6 +51,17 @@ export const networks: NetworkList = {
     pubKeyHash: 0x30, //48,
     scriptHash: 0x32, //50,
     wif: 0xb0, //176,
+  },
+  bch: {
+    messagePrefix: '\x18Bitcoin Signed Message:\n',
+    bech32: 'bc',
+    bip32: {
+      public: 0x0488b21e,
+      private: 0x0488ade4,
+    },
+    pubKeyHash: 0x00,
+    scriptHash: 0x08,
+    wif: 0x80,
   },
 }
 

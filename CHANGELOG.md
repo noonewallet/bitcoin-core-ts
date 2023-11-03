@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/mokkapps/changelog-generator-demo/compare/v1.2.0...v1.3.0) (2023-11-03)
+
+
+* change bch address generation function ([caa8531](https://github.com/mokkapps/changelog-generator-demo/commits/caa853115aa400de9b1582fb7f324f7828303243))
+* rm unused method from tx builder (btc and doge) ([b0694ac](https://github.com/mokkapps/changelog-generator-demo/commits/b0694ac0eb585fefe978e47b1b4ac1e6c3653ebf))
+* update dependency versions ([32ffa62](https://github.com/mokkapps/changelog-generator-demo/commits/32ffa62979308e6ad48f50e1c57dee81d4fe5c76))
+
 ## [1.2.0](https://github.com/mokkapps/changelog-generator-demo/compare/v1.1.0...v1.2.0) (2023-10-30)
 
 
