@@ -1,10 +1,13 @@
+import * as bitcoin from 'bitcoinjs-lib'
 import * as bchaddr from 'bchaddrjs'
 import * as bitcore from 'bitcore-lib-cash'
 import CustomError from '@helpers/error/custom-error'
 import {HDNode} from '@noonewallet/crypto-core-ts'
 import {Address, IInput, IOutput} from '@helpers/types'
 import {BCH} from '@helpers/currencies'
+import {networks} from '@helpers/networks'
 
+const toCashAddress = bchaddr.toCashAddress
 /**
  * Getting Bitcoin Cash address by node and derivation index
  * @param {Object} node - Input data for a transaction
@@ -26,51 +29,32 @@ export const getBchAddressByNode = (
   withPrefix?: boolean,
 ): Address => {
   try {
-    const pubKey = node.deriveChild(childIndex).pubKeyHash
-    const address = bitcore.Address.fromPublicKeyHash(pubKey, BCH.network)
-    const finalAddress = address.toCashAddress()
-    if (withPrefix) return finalAddress
-    return removeAddressPrefix(finalAddress)
+    const pubKey = node.deriveChild(childIndex).publicKey
+    return getBchAddressByPublicKey(pubKey, withPrefix)
   } catch (e) {
     console.log(e)
     throw new CustomError('err_core_bch_address')
   }
 }
 
-// export const getBchCore = (node: HDNode): ICoinCore => {
-//   const path = {
-//     external: BCH.path + '/0',
-//     internal: BCH.path + '/1',
-//   }
-//
-//   const externalNode = node.derive(path.external)
-//   const internalNode = node.derive(path.internal)
-//
-//   const res: ICoinCore = {
-//     externalNode: externalNode.privateExtendedKey,
-//     internalNode: internalNode.privateExtendedKey,
-//     externalAddress: '',
-//     internalAddress: '',
-//   }
-//
-//   res.externalAddress = getBchAddressByNode(externalNode, 0)
-//   res.internalAddress = getBchAddressByNode(internalNode, 0)
-//
-//   return res
-// }
-
 export function getBchAddressByPublicKey(
-  pubKey: string,
+  pubKey: string | Buffer,
   withPrefix?: boolean,
 ): Address {
   if (!pubKey) return ''
-
   try {
-    const bitcorePubKey = new bitcore.PublicKey(pubKey)
-    const address = bitcore.Address.fromPublicKey(bitcorePubKey, BCH.network)
-    const finalAddress = address.toCashAddress()
-    if (withPrefix) return finalAddress
-    return removeAddressPrefix(finalAddress)
+    const finalPubKey = Buffer.isBuffer(pubKey) ? pubKey : Buffer.from(pubKey)
+    const legacyAddress = bitcoin.payments.p2pkh({
+      pubkey: finalPubKey,
+      network: networks.bch,
+    }).address
+    if (legacyAddress) {
+      const finalAddress = toCashAddress(legacyAddress)
+
+      if (withPrefix) return finalAddress
+      return removeAddressPrefix(finalAddress)
+    }
+    return ''
   } catch (e) {
     console.log(e)
     throw new CustomError('err_core_bch_address')
@@ -89,8 +73,6 @@ export function convertToCashAddress(
   // withPrefix?: boolean,
 ): string {
   try {
-    const toCashAddress = bchaddr.toCashAddress
-
     return toCashAddress(address)
   } catch (e) {
     console.log(e)
