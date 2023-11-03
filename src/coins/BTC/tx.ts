@@ -40,7 +40,6 @@ export class BtcTx extends BaseTx {
 
   constructor(data: ITxData) {
     super(data)
-    // this.feeIds = FeeIds
     this.type = data.type || 'p2pkh'
     this.currency = this.type === 'p2pkh' ? BTC : BTC_SEGWIT
   }
@@ -93,68 +92,24 @@ export class BtcTx extends BaseTx {
 
   async getInputsWithTxInfo(inputs: IUnspent[]): Promise<IInput[] | undefined> {
     try {
-      let rawTxsData: any[] = []
       const finalInputs: IInput[] = []
 
-      if (this.type === 'p2pkh') {
-        const hashes = []
-
-        for (const input of inputs) {
-          if (!input.tx) {
-            if (input.transaction_hash) {
-              hashes.push(input.transaction_hash)
-            } else {
-              throw new CustomError('err_tx_btc_unspent')
-            }
-          }
-        }
-        const unique_hashes = [...new Set(hashes)]
-
-        // rawTxsData = await request.getRawTx(unique_hashes)
-        rawTxsData = []
-
-        for (const input of inputs) {
-          const item: IInput = {
-            hash: input.transaction_hash,
-            index: input.index,
-            address: input.address,
-            value: input.value,
-            key: '',
-          }
-          if (!input.tx) {
-            const data = rawTxsData.find(
-              (item: IRawTxResponse) => item.hash === input.transaction_hash,
-            )
-            item.tx = data ? data.rawData : null
-          } else {
-            item.tx = input.tx
-          }
-          item.key =
+      for (const input of inputs) {
+        const item: IInput = {
+          hash: input.transaction_hash,
+          index: input.index,
+          address: input.address,
+          value: input.value,
+          tx: input.tx || null,
+          key:
             input.key ||
             getBtcPrivateKeyByIndex(
               this.nodes[input.node_type],
               input.derive_index,
-            )
-
-          finalInputs.push(item)
+            ),
         }
-      } else {
-        for (const input of inputs) {
-          const item: IInput = {
-            hash: input.transaction_hash,
-            index: input.index,
-            address: input.address,
-            value: input.value,
-            key:
-              input.key ||
-              getBtcPrivateKeyByIndex(
-                this.nodes[input.node_type],
-                input.derive_index,
-              ),
-          }
 
-          finalInputs.push(item)
-        }
+        finalInputs.push(item)
       }
 
       return finalInputs

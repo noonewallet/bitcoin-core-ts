@@ -82,6 +82,7 @@ export interface IFeeTx {
   feePerByte: number
   inputs: IUnspent[]
   inputsAmount: number
+  tx?: string
   custom?: boolean
 }
 

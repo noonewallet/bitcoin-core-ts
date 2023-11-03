@@ -3,15 +3,8 @@ import {BaseTx} from '@modules/base-tx'
 import converter from '@helpers/converters'
 import {getBtcPrivateKeyByIndex} from '@helpers/utils'
 import CustomError from '@helpers/error/custom-error'
-import {
-  IInput,
-  IOutput,
-  IRawTxData,
-  IRawTxResponse,
-  ITxData,
-} from '@helpers/types'
+import {IInput, IOutput, IRawTxData, ITxData} from '@helpers/types'
 import {networks} from '@helpers/networks'
-// import {CoinsNetwork} from '@noonewallet/network-js'
 import {Network} from 'bitcoinjs-lib'
 import {DOGE, ICurrency} from '@helpers/currencies'
 
@@ -42,7 +35,6 @@ export class DogeTx extends BaseTx {
     this.currency = DOGE
     this.type = DOGE.type
     this.txOptions = {network: networks.doge, maximumFeeRate: 2000000}
-    // this.reqHandler = CoinsNetwork.doge
   }
 
   /**
@@ -68,48 +60,23 @@ export class DogeTx extends BaseTx {
     const change = fee.inputsAmount - amountInSat - fee.value
     const inputs: IInput[] = []
     const outputs: IOutput[] = []
-    const hashes = []
 
     if (change < 0) {
       throw new CustomError('err_tx_doge_balance')
     }
 
-    for (const input of fee.inputs) {
-      if (!input.tx) {
-        if (input.transaction_hash) {
-          hashes.push(input.transaction_hash)
-        } else {
-          throw new CustomError('err_tx_btc_unspent')
-        }
-      }
-    }
-
-    // const unique_hashes = [...new Set(hashes)]
-    const rawTxsData: any[] = []
-    // const rawTxsData = await this.reqHandler.getRawTx(unique_hashes)
-
     for (const utxo of fee.inputs) {
-      hashes.push(utxo.transaction_hash)
-
       const item: IInput = {
         hash: utxo.transaction_hash,
         index: utxo.index,
         address: utxo.address,
         value: utxo.value,
+        tx: utxo.tx,
         key: getBtcPrivateKeyByIndex(
           this.nodes[utxo.node_type],
           utxo.derive_index,
         ),
       }
-      const data = rawTxsData.find(
-        (item: IRawTxResponse) => item.hash === utxo.transaction_hash,
-      )
-      if (!utxo.tx) {
-        item.tx = data ? data.rawData : null
-      } else {
-        item.tx = utxo.tx
-      }
-
       inputs.push(item)
     }
 
