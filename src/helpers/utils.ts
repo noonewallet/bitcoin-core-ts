@@ -117,7 +117,9 @@ export const getBtcBasedCore = (
 
   const res: ICoinCore = {
     externalNode: externalNode.privateExtendedKey,
+    externalPubKey: externalNode.publicExtendedKey,
     internalNode: internalNode.privateExtendedKey,
+    internalPubKey: internalNode.publicExtendedKey,
     externalAddress: '',
     internalAddress: '',
   }
