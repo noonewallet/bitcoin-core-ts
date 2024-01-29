@@ -1,5 +1,6 @@
 import * as bitcoin from 'bitcoinjs-lib'
 import {HDNode, privateKeyToWIF, hdFromXprv} from '@noonewallet/crypto-core-ts'
+import {xpubConverter} from '@noonewallet/crypto-core-ts/dist/utils/xpub-converter'
 import {networks, NetworkType} from '@helpers/networks'
 import CustomError from '@helpers/error/custom-error'
 import {CurrencyType, ICoinCore} from '@helpers/types'
@@ -114,10 +115,21 @@ export const getBtcBasedCore = (
 
   const externalNode = node.derive(path.external)
   const internalNode = node.derive(path.internal)
+  const pkPrefix = currency.pubKeyPrefix
+  const externalPubKey =
+    pkPrefix !== 'xpub'
+      ? xpubConverter(externalNode.publicExtendedKey, pkPrefix)
+      : externalNode.publicExtendedKey
+  const internalPubKey =
+    pkPrefix !== 'xpub'
+      ? xpubConverter(internalNode.publicExtendedKey, pkPrefix)
+      : internalNode.publicExtendedKey
 
   const res: ICoinCore = {
     externalNode: externalNode.privateExtendedKey,
+    externalPubKey: externalPubKey,
     internalNode: internalNode.privateExtendedKey,
+    internalPubKey: internalPubKey,
     externalAddress: '',
     internalAddress: '',
   }

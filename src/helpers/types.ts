@@ -154,7 +154,9 @@ export interface ITxOptions {
 
 export interface ICoinCore {
   externalNode: string
+  externalPubKey: string
   internalNode: string
+  internalPubKey: string
   externalAddress: Address | undefined
   internalAddress: Address | undefined
 }
