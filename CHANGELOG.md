@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://github.com/mokkapps/changelog-generator-demo/compare/v1.3.0...v1.4.0) (2024-01-29)
+
+
+### Features
+
+* **1078:** added convertor pub key ([8e1f753](https://github.com/mokkapps/changelog-generator-demo/commits/8e1f75332fd0fa3df67dd0717d79f77fd2f8c769))
+* **1078:** added pub key ([b1cea48](https://github.com/mokkapps/changelog-generator-demo/commits/b1cea48c85c256fe6ed59e4950f8cc256d422cb8))
+
 ## [1.3.0](https://github.com/mokkapps/changelog-generator-demo/compare/v1.2.0...v1.3.0) (2023-11-03)
 
 
