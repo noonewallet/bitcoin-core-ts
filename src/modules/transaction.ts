@@ -40,6 +40,7 @@ export function makeRawTx(
       const data: IInputForSign = {
         hash: input.hash,
         index: input.index,
+        sequence: input.sequence,
       }
 
       if (isSegwit) {
@@ -113,6 +114,8 @@ export function makeRawTx(
     return {
       hash,
       tx: signedTransaction,
+      inputs,
+      outputs,
     }
   } catch (e) {
     console.log(e)

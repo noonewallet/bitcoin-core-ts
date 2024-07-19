@@ -68,6 +68,7 @@ export interface IUnspent {
   value: number
   tx?: RawTx
   key?: string
+  sequence?: number
 }
 
 export interface IFeeSync {
@@ -104,6 +105,9 @@ export interface ITxData {
   }
   feeList: IFeeSync[]
   type: CurrencyType
+  isRbf?: boolean
+  isReplacement?: boolean
+  replacedTx?: any
 }
 
 export interface IRawTxData {
@@ -111,6 +115,9 @@ export interface IRawTxData {
   changeAddress: Address
   fee: IFeeTx
   amount: number
+  isRbf?: boolean
+  isReplacement?: boolean
+  replacementCount?: number
 }
 
 export type Address = string
@@ -125,6 +132,7 @@ export interface IInput {
   key: KeyInWif
   tx?: RawTx | null
   transaction_hash?: string
+  sequence?: number
 }
 
 export interface IOutput {
@@ -139,6 +147,7 @@ export interface IInputForSign {
     script: Buffer
     value: number
   }
+  sequence?: number
   nonWitnessUtxo?: Buffer
 }
 
@@ -159,4 +168,54 @@ export interface ICoinCore {
   internalPubKey: string
   externalAddress: Address | undefined
   internalAddress: Address | undefined
+}
+
+export interface IUTXO {
+  txId: string
+  index: number
+  value: number
+  address: string
+  scriptPubKey: string
+  node_type?: NodeType
+  derive_index?: number
+  tx?: string
+  transaction_hash?: string
+}
+
+export interface IDecodeInput {
+  sequence: number
+  witness: string
+  script: string
+  index: number
+  prev_out: {
+    type: number
+    spent: boolean
+    value: number
+    spending_outpoints: {tx_index: number; n: number}[]
+    n: number
+    addr: string
+    tx_index: number
+    script: string
+    node_type?: NodeType
+    derive_index?: number
+    tx?: string
+    transaction_hash?: string
+  }
+}
+
+export interface IDecodeOutput {
+  type: number
+  spent: boolean
+  value: number
+  spending_outpoints: any[]
+  n: number
+  addr: string
+  tx_index: number
+  script: string
+}
+
+export interface IDecodedTx {
+  inputs: IDecodeInput[]
+  outputs: IDecodeOutput[]
+  locktime: number
 }

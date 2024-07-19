@@ -40,7 +40,13 @@ export class BaseTx {
     this.dust = 1000
   }
 
-  async calcFee(amount = 0, customFee = 0, sendAll = false): Promise<IFeeTx[]> {
+  async calcFee(
+    amount = 0,
+    customFee = 0,
+    sendAll = false,
+    isReplacement = false,
+    originalTx = {},
+  ): Promise<IFeeTx[]> {
     const fees: number[] = []
     let amountInSat = 0
 
@@ -59,7 +65,9 @@ export class BaseTx {
     }
 
     const pArray = fees.map(async (fee) => {
-      if (sendAll) {
+      if (isReplacement) {
+        return this.getReplaceInputs(fee, amountInSat, originalTx)
+      } else if (sendAll) {
         return this.getSendAllInputs(fee, amountInSat)
       } else {
         return await this.getInputs(fee, amountInSat)
@@ -169,6 +177,85 @@ export class BaseTx {
       }
     }
     await req()
+
+    return res
+  }
+
+  async getReplaceInputs(
+    fee: number,
+    amount: number,
+    originalTx: any,
+  ): Promise<IFeeInputScope> {
+    if (!fee) {
+      return {
+        fee: 0,
+        inputs: [],
+        inputsAmount: 0,
+      }
+    }
+
+    let inputsAmount = 0
+    const inputs: IUnspent[] = []
+    let res: IFeeInputScope = {
+      fee: 0,
+      inputs: [],
+      inputsAmount: 0,
+    }
+    const calculateFee = (numInputs: number, numOutputs: number): number => {
+      const size = calcTxSize(numInputs, numOutputs, this.type === 'p2wpkh')
+      return size * fee
+    }
+    for (const input of originalTx.inputs) {
+      const newInput: IUnspent = {
+        derive_index: input.prev_out?.derive_index || 0,
+        block_id: 0,
+        transaction_hash: input.prev_out.transaction_hash || '',
+        index: input.prev_out.n,
+        value: input.prev_out.value,
+        address: input.prev_out.addr,
+        tx: input.prev_out.tx,
+        node_type: input.prev_out.node_type || 'internal',
+        sequence: input.sequence + 1 || 1,
+      }
+      inputs.push(newInput)
+      inputsAmount += input.prev_out.value
+    }
+
+    let calcFee = calculateFee(inputs.length, 2)
+    let totalRequired = amount + calcFee + this.dust
+
+    let index = 0
+    while (inputsAmount < totalRequired && index < this.unspent.length) {
+      const item = this.unspent[index]
+      if (item.block_id !== -1) {
+        inputs.push(item)
+        inputsAmount += item.value
+
+        // Recalculate the total required after adding the new input
+        calcFee = calculateFee(inputs.length, 2)
+        totalRequired = amount + calcFee + this.dust
+      }
+      index++
+    }
+
+    // Final fee calculation after adding all necessary inputs
+    calcFee = calculateFee(inputs.length, 2)
+    totalRequired = amount + calcFee + this.dust
+
+    // Ensure the total input amount covers the outputs and fee
+    if (inputsAmount < totalRequired) {
+      return {
+        fee: 0,
+        inputs: [],
+        inputsAmount: 0,
+      }
+    }
+
+    res = {
+      fee: calcFee,
+      inputs: inputs,
+      inputsAmount: inputsAmount,
+    }
 
     return res
   }
