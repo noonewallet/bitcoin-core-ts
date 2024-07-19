@@ -28,6 +28,9 @@ import {BTC, BTC_SEGWIT, ICurrency} from '@helpers/currencies'
 
 export class BtcTx extends BaseTx {
   private currency: ICurrency
+  private isRbf?: boolean
+  private isReplacement?: boolean
+  private replacedTx?: any
 
   /**
    * Create a BitcoinTx
@@ -42,6 +45,9 @@ export class BtcTx extends BaseTx {
     super(data)
     this.type = data.type || 'p2pkh'
     this.currency = this.type === 'p2pkh' ? BTC : BTC_SEGWIT
+    this.isRbf = data.isRbf || false
+    this.isReplacement = data.isReplacement || false
+    this.replacedTx = data.replacedTx || {}
   }
 
   async make(data: IRawTxData) {
@@ -87,14 +93,30 @@ export class BtcTx extends BaseTx {
   /**
    * Returns the required data to create a transaction
    * @param {Array} inputs - Array of inputs for tx
+   * @param {Boolean} isRbf
+   * @param {Boolean} isReplacement
    * @returns {Promise<Array>} Returns an array of inputs with a private keys and raw transaction data for p2pkh items
    */
 
   async getInputsWithTxInfo(inputs: IUnspent[]): Promise<IInput[] | undefined> {
     try {
       const finalInputs: IInput[] = []
+      const usedInputs: string[] = []
+      if (Object.keys(this.replacedTx).length) {
+        this.replacedTx.inputs.forEach((input: any) => {
+          usedInputs.push(`${this.replacedTx.hash}:${input.index}`)
+        })
+      }
 
       for (const input of inputs) {
+        let sequence = 4294967295 // Default sequence for non-RBF
+        if (this.isRbf) {
+          if (input.hasOwnProperty('sequence')) {
+            sequence = input?.sequence || 0
+          } else {
+            sequence = 0
+          }
+        }
         const item: IInput = {
           hash: input.transaction_hash,
           index: input.index,
@@ -107,6 +129,7 @@ export class BtcTx extends BaseTx {
               this.nodes[input.node_type],
               input.derive_index,
             ),
+          sequence: sequence,
         }
 
         finalInputs.push(item)

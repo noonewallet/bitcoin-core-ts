@@ -3,7 +3,14 @@ import {HDNode, privateKeyToWIF, hdFromXprv} from '@noonewallet/crypto-core-ts'
 import {xpubConverter} from '@noonewallet/crypto-core-ts/dist/utils/xpub-converter'
 import {networks, NetworkType} from '@helpers/networks'
 import CustomError from '@helpers/error/custom-error'
-import {CurrencyType, ICoinCore} from '@helpers/types'
+import {
+  CurrencyType,
+  ICoinCore,
+  IDecodeOutput,
+  IUTXO,
+  IDecodeInput,
+  IDecodedTx,
+} from '@helpers/types'
 import * as currencies from '@helpers/currencies'
 import {getBchAddressByNode, getBchAddressByPublicKey} from '@coins/BCH/utils'
 
@@ -280,4 +287,69 @@ export function calcTxSize(i = 1, o = 2, isWitness = false): number {
   }
 
   return Math.ceil(result)
+}
+
+/**
+ * Function decodes the raw transaction to get inputs and outputs details using
+ * @param {string} rawTx - raw transaction
+ * @param {arrey} utxoSet - utxo set
+ * @returns {Object} inputs and outputs of transactions
+ */
+
+export function decodeRawTransaction(
+  rawTx: string,
+  utxoSet: IUTXO[],
+  inputsWithRawTx: IUTXO[],
+): IDecodedTx {
+  const tx = bitcoin.Transaction.fromHex(rawTx)
+  const inputs: IDecodeInput[] = tx.ins.map((input, index) => {
+    const prevTxId = Buffer.from(input.hash).reverse().toString('hex')
+    const utxo = utxoSet[index]
+    const utxoWithRawTx = inputsWithRawTx[index]
+
+    if (!utxo) {
+      throw new Error(
+        `UTXO not found for txId: ${prevTxId}, index: ${input.index}`,
+      )
+    }
+
+    return {
+      sequence: input.sequence,
+      witness: input.witness.length
+        ? input.witness.map((w) => w.toString('hex')).join(' ')
+        : '',
+      script: input.script.toString('hex'),
+      index: index,
+      prev_out: {
+        type: 0, // Assuming type 0
+        spent: true,
+        value: utxo.value,
+        spending_outpoints: [{tx_index: 0, n: input.index}],
+        n: input.index,
+        addr: utxo.address,
+        tx_index: 0,
+        script: utxo.scriptPubKey,
+        node_type: utxoWithRawTx?.node_type || 'internal',
+        derive_index: utxoWithRawTx?.derive_index || 0,
+        tx: utxoWithRawTx?.tx || '',
+        transaction_hash: utxoWithRawTx?.transaction_hash || '',
+      },
+    }
+  })
+
+  const outputs: IDecodeOutput[] = tx.outs.map((output, index) => ({
+    type: 0, // Assuming type 0
+    spent: false,
+    value: output.value,
+    spending_outpoints: [],
+    n: index,
+    addr: bitcoin.address.fromOutputScript(
+      output.script,
+      bitcoin.networks.bitcoin,
+    ),
+    tx_index: 0,
+    script: output.script.toString('hex'),
+  }))
+
+  return {inputs, outputs, locktime: tx.locktime}
 }
