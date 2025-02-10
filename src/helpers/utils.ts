@@ -1,5 +1,7 @@
 import * as bitcoin from 'bitcoinjs-lib'
-import {HDNode, privateKeyToWIF, hdFromXprv} from '@noonewallet/crypto-core-ts'
+import {BIP32Factory} from 'bip32'
+import ecc from '@bitcoinerlab/secp256k1'
+import {HDNode, privateKeyToWIF, hdFromXprv, mnemonicToSeed} from '@noonewallet/crypto-core-ts'
 import {xpubConverter} from '@noonewallet/crypto-core-ts/dist/utils/xpub-converter'
 import {networks, NetworkType} from '@helpers/networks'
 import CustomError from '@helpers/error/custom-error'
@@ -103,11 +105,82 @@ const getCurrencyName = (shortName = 'BTC', type: CurrencyType) => {
   } else return shortName.toUpperCase()
 }
 
+
+/**
+ * Generates the account-level extended public key (e.g. xpub, ypub, or zpub)
+ * from a given mnemonic. You can specify the derivation path as well as the desired
+ * key type.
+ *
+ * @param {string} mnemonic - The mnemonic phrase.
+ * @param {string} [bipPath="m/44'/0'/0'"] - The BIP32 derivation path for the account.
+ *     Use "m/44'/0'/0'" for legacy (xpub), "m/49'/0'/0'" for P2SH-SegWit (ypub),
+ *     or "m/84'/0'/0'" for native SegWit (zpub).
+ * @param {string} [desiredKeyType="xpub"] - The desired extended public key type.
+ *     (Either "xpub", "ypub", or "zpub".)
+ * @param {NetworkType} [networkType="btc"] - The network to use (e.g. "btc" or custom).
+ * @returns {string} The account extended public key.
+ *
+ * @throws Will throw an error if seed generation or derivation fails.
+ */
+export const getAccountExtendedPublicKey = (
+  mnemonic: string,
+  bipPath: string = "m/44'/0'/0'",
+  desiredKeyType: 'xpub' | 'ypub' | 'zpub' = 'xpub',
+  networkType: NetworkType = 'btc'
+): string => {
+  try {
+    // 1. Convert mnemonic to seed.
+    // (You can use bip39.mnemonicToSeedSync or your own mnemonicToSeed function.)
+    const seed = mnemonicToSeed(mnemonic)
+
+    // 2. Create the root node from the seed.
+    const network = networks[networkType]
+    const bip32 = BIP32Factory(ecc)
+    const root = bip32.fromSeed(seed, network)
+
+    // 3. Derive the account node (e.g. m/44'/0'/0' for legacy).
+    const accountNode = root.derivePath(bipPath)
+
+    // 4. “Neuter” the node (remove the private key) to get the extended public key.
+    const accountXpub = accountNode.neutered().toBase58()
+    // 5. If the desired type is not "xpub", convert using the provided converter.
+    if (desiredKeyType !== 'xpub') {
+      return xpubConverter(accountXpub, desiredKeyType)
+    }
+    return accountXpub
+  } catch (error) {
+    console.error('Error generating account extended public key:', error)
+    return ''
+  }
+}
+
+/**
+ * Returns a core object with external/internal nodes/addresses and the account
+ * extended public key.
+ *
+ * It performs the following steps:
+ * 1. Determines the currency settings (derivation path, network, pubKeyPrefix, etc.)
+ *    based on the provided shortName and type.
+ * 2. Derives the account node using the currency's account derivation path.
+ * 3. Extracts the account extended public key (with conversion if needed).
+ * 4. Derives the external (chain 0) and internal (chain 1) nodes from the account node.
+ * 5. Gets the external and internal addresses using the appropriate helper.
+ *
+ * @param node - The master HDNode (or a node above the account level)
+ * @param shortName - The coin short name (default "BTC")
+ * @param type - The currency type (e.g. "p2pkh", "p2wpkh")
+ * @param mnemonic - The mnemonic
+ * @returns An object of type ICoinCore with keys, addresses, and account extended public key.
+ *
+ * @throws CustomError if the currency is not recognized.
+ */
 export const getBtcBasedCore = (
   node: HDNode,
   shortName = 'BTC',
   type: CurrencyType,
+  mnemonic = '',
 ): ICoinCore => {
+
   const currencyName = getCurrencyName(shortName, type)
 
   if (!(currencyName in currencies)) {
@@ -115,9 +188,23 @@ export const getBtcBasedCore = (
   }
   // @ts-ignore
   const currency = currencies[currencyName]
+
   const path = {
     external: currency.path + '/0',
     internal: currency.path + '/1',
+  }
+
+  const getDesiredKeyTypeFromPath = (path: string): 'xpub' | 'ypub' | 'zpub' => {
+    if (path.includes("44'")) return 'xpub'
+    if (path.includes("49'")) return 'ypub'
+    if (path.includes("84'")) return 'zpub'
+    return currency.pubKeyPrefix || 'xpub'
+  }
+
+  let accountExtendedPublicKey = ''
+  if (mnemonic) {
+    const desiredKeyType = getDesiredKeyTypeFromPath(currency.path)
+    accountExtendedPublicKey = getAccountExtendedPublicKey(mnemonic, currency.path, desiredKeyType, currency.network)
   }
 
   const externalNode = node.derive(path.external)
@@ -139,6 +226,7 @@ export const getBtcBasedCore = (
     internalPubKey: internalPubKey,
     externalAddress: '',
     internalAddress: '',
+    accountExtendedPublicKey: accountExtendedPublicKey
   }
 
   if (currencyName !== 'BCH') {
