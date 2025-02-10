@@ -168,6 +168,7 @@ export interface ICoinCore {
   internalPubKey: string
   externalAddress: Address | undefined
   internalAddress: Address | undefined
+  accountExtendedPublicKey: string
 }
 
 export interface IUTXO {
